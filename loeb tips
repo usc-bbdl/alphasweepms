@@ -1,0 +1,21 @@
+preflexes
+zero operating point of force velocity curve
+perturbasion resilience: 
+
+pick muscle with steepest slope (high pennations0
+
+
+)
+cross bridges behavior (not activaiton changes)
+chang et al 2009 trained monkey to make rapid endpoint movemens in 1DOF task
+put in different patterns of perturbations
+fascicle length and moment arms are different
+
+
+
+make a cost function(a, the strengths of all muscles, the fast twitch percentages)
+so you know when a muscle is forced to use its fast twitch muscle fibers
+
+f0.5 frequency at which you get half of the isometric force. (pulses per second is different for fast and slow twitch muscles)
+
+ask jerry for ankle DOF's with tibialis posterior (small moment arms in both axes)

@@ -1,0 +1,103 @@
+\section{METHODS}
+[briantodo put in the models that we applied our things to]
+% subsection minimization_of_change_in_activation (end)
+\subsection{Minimization of total activation}
+\label{sub:minimization_of_total_activation} % (fold)
+We are given $k$ discrete time steps and its corresponding output constraints and activation constrains
+\begin{align*}
+A^1 x^1 &= b^1 \\
+A^2 x^2 &= b^2 \\
+ &\vdots \\
+A^k x^k &= b^k \\
+x^j &\in [0,1]^n \text{ for all } j \in \{1,2,\dots,k\} 
+\end{align*}
+Given in this configuration the time steps are independent of each other. Additionally we now give the spatio temporal constraints in the form of $|x_i^{j+1} - x_i^{j}| \leq \delta_i^j|$ for $i \in \{1,2,\dots,n\}, j \in \{1,2,\dots,k-1\}$, i.e.\ the activation of muscle $i$ can not change more than $\delta_i^j$ between step $j$ and step $j+1$. Note that $|x_i^{j+1} - x_i^{j}| \leq \delta_i^j$ is not a linear constraint itself but can easily be replaced by the two constraints $x_i^{j+1} - x_i^{j} \leq \delta_i^j$ and $x_i^{j} - x_i^{j+1} \leq \delta_i^j$
+
+Finding a solution where we minimize total activation is hence given by
+
+\begin{equation}
+\begin{array}{lrcl}
+\mbox{minimize} & \sum_{j=1}^k \sum_{i=1}^n x_i^j \\ 
+\mbox{subject to} & A^j x^j &=& b^j \hspace{5mm} \forall j \in \{1,\dots, k\} \\
+  & x_i^{j+1} - x_i^{j} &\leq& \delta_i^j  \hspace{5mm} \forall j \in \{1,\dots, k-1\}, i \in \{1,\dots,n\} \\
+  &  -(x_i^{j+1} - x_i^{j}) &\leq& \delta_i^j  \hspace{5mm} \forall j \in \{1,\dots, k-1\}, i \in \{1,\dots,n\} \\
+  & x^j &\in& [0,1]^n \hspace{5mm} \forall j \in \{1,\dots, k\}.
+\end{array}
+\end{equation}
+
+This is a linear program in $kn$ variables.
+
+
+
+% subsection minimization_of_total_activation (end)
+
+\subsection{Minimization of change in activation} % (fold)
+\label{sub:minimization_of_change_in_activation}
+The activation change of muscle $i$ between time step $j$ and $j+1$ is given by
+\[|x_i^{j+1} - x_i^{j}|.\]
+We are now interested in the solution of the above system, where the sum of the change of activations is minimized. I.e.\ we minimize $\sum_{j=1}^{k-1}\sum_{i=1}^n |x_i^{j+1} - x_i^{j}|$, under the output constraints, activation constraints and spatio-temporal constraints. The linear program therefore looks as follows:
+
+\begin{equation}
+\begin{array}{lrcl}
+\mbox{minimize} & \sum_{j=1}^{k-1} \sum_{i=1}^n |x_i^{j+1} - x_i^{j}| \\ 
+\mbox{subject to} & A^j x^j &=& b^j \hspace{5mm} \forall j \in \{1,\dots, k\} \\
+  & x_i^{j+1} - x_i^{j} &\leq& \delta_i^j  \hspace{5mm} \forall j \in \{1,\dots, k-1\}, i \in \{1,\dots,n\} \\
+  &  -(x_i^{j+1} - x_i^{j}) &\leq& \delta_i^j  \hspace{5mm} \forall j \in \{1,\dots, k-1\}, i \in \{1,\dots,n\} \\
+  & x^j &\in& [0,1]^n \hspace{5mm} \forall j \in \{1,\dots, k\}.
+\end{array}
+\end{equation}
+
+This is technically not a linear program since the objective function consists of absolute values of linear terms. By a standard trick this problem can be captured in a linear program. Instead of minimizing $\sum_{j=1}^{k-1} \sum_{i=1}^n |x_i^{j+1} - x_i^{j}|$ we minimize $\sum_{j=1}^{k-1} \sum_{i=1}^n e_i^j$ and add constraints 
+\begin{align*}
+e_i^j &\geq x_i^{j+1} - x_i^{j} \\
+e_i^j &\geq - (x_i^{j+1} - x_i^{j}).
+\end{align*}
+
+For each term $|x_i^{j+1} - x_i^{j}|$, we add an auxiliary variable $e_i^j$. The constraints guarantee that 
+\[e_i^j \geq \max\{x_i^{j+1} - x_i^{j}, - (x_i^{j+1} - x_i^{j})\} = |x_i^{j+1} - x_i^{j}|.\]
+For an optimal solution each of these inequalities has to be satisfied with equality, otherwise we could decrease the corresponding $e_i^j$. The linear program on $kn + (k-1)n$ variables that we are interested in solving is hence given by
+
+\begin{equation}
+\begin{array}{lrcl}
+\mbox{minimize} & \sum_{j=1}^{k-1} \sum_{i=1}^n e_i^j \\ 
+\mbox{subject to} & A^j x^j &=& b^j \hspace{5mm} \forall j \in \{1,\dots, k\} \\
+  & x_i^{j+1} - x_i^{j} &\leq& \delta_i^j  \hspace{5mm} \forall j \in \{1,\dots, k-1\}, i \in \{1,\dots,n\} \\
+  &  -(x_i^{j+1} - x_i^{j}) &\leq& \delta_i^j  \hspace{5mm} \forall j \in \{1,\dots, k-1\}, i \in \{1,\dots,n\} \\
+  & x^j &\in& [0,1]^n \hspace{5mm} \forall j \in \{1,\dots, k\} \\
+  & e_i^j &\geq& x_i^{j+1} - x_i^{j} \hspace{5mm} \forall j \in \{1,\dots, k-1\}, i \in \{1,\dots,n\}\\
+  & e_i^j &\geq& -(x_i^{j+1} - x_i^{j}) \hspace{5mm} \forall j \in \{1,\dots, k-1\}, i \in \{1,\dots,n\}.
+\end{array}
+\end{equation}
+
+For muscle $i$ at moment $j$, $\delta_i^j$ is equal to the amount of change in normalized activation ($a \in [0,1]$) possible up to the \textbf{next} time point; we chose to define $\delta$ as future capability of change. Because of this, there will be $k-1$ total values of delta used; $\delta$ at the last time point will not be used in our computations.
+
+\subsection{Past and Future Constraints}
+Again we consider $k$ time steps and it's corresponding output constraints of form
+\begin{align}
+A^j x^j &= b^j \nonumber \\
+x_j &\in [0,1]^n. \label{ls_nospatio}
+\end{align}
+
+The goal is to explore the feasible regions of each time step, with the spatio-temporal constraints added. I.e.\ we are interested in the set of feasible activations in time step $l \in \{1,2,\dots,k\}$ given by all $x_j \in [0,1]^n$ that satisfy
+\begin{align}
+A^jx^j &= b^j \hspace{5mm} j \in \{1,2,\dots, k\}  \nonumber \\
+x^j &\in [0,1]^n \hspace{5mm}  j \in \{1,2,\dots, k\} \nonumber \\
+|x_i^j - x_i^{j+1}| &\leq d_i^j \hspace{5mm} i \in \{1,2,\dots,n\}, j \in \{1,2,\dots, k-1\}.  \label{ls_spatio}
+\end{align}
+The solution set $(x^1,x^2, \dots x^k)$ of this linear program is exactly the set of all feasible activations patterns on our $k$ time steps. 
+
+The strategy to explore this feasible activation space is as follows. We use Hit-and-Run on the $l$-th time step without spatio-temporal constraints i.e.\ on 
+\begin{align}
+A^l x^l &= b^l \nonumber \\
+x_l &\in [0,1]^n. \nonumber
+\end{align}
+As in [cite our old paper] this returns us uniformly distributed points $P = \{p_1,p_1,\dots, p_M\}$. Now for each point $p \in P$ we check whether there exists a solution to LP \ref{ls_spatio} with $x_l = p$ i.e.\ is there a solution to: 
+\begin{align}
+A^jx^j &= b^j \hspace{5mm} j \in \{1,2,\dots, k\}  \nonumber \\
+x^j &\in [0,1]^n \hspace{5mm}  j \in \{1,2,\dots, k\} \nonumber \\
+|x_i^j - x_i^{j+1}| &\leq d_i^j \hspace{5mm} i \in \{1,2,\dots,n\}, j \in \{1,2,\dots, k-1\}.  \nonumber \\%\label{ls_spatio} 
+x^l %= p.
+\end{align}
+We see that there exists a solution if and only if there is a feasible walk with $x^l = p$. Let $P_1$ be the set of points of $P$ that have such a feasible walk. Then those points are uniformly distributed on the solution set $x^l$ of \ref{ls_spatio} and the same methods as in [cite our paper] can be applied.
+
+We can not directly apply the Hit-and-Run algorithm on \ref{ls_spatio}, since the uniform distribution is generated on the variable $(x^1,x_2,\dots,x^k)$, and not the desired $x^l$. It is possible to eliminate the unnecessary variables by the Fourier-Motzkin method [cite], but the number of inequalities generated is doubly exponential in the number of variables removed and hence this method is infeasible in practice.
